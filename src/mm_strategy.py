@@ -61,6 +61,22 @@ class MMStrategy(Strategy):
                     asyncio.create_task(
                         self._quoter.place_limit(ticker=ticker, volume=volume_ask, price=ask_price, is_bid=False)
                     )
+        pass
+
+    async def calc_bid_ask(self, ticker: str):
+        wmid = self.wmid(ticker=ticker)
+        spread = self.spread(ticker=ticker)
+
+        bid_volume = np.sum(self.get_orderbooks[ticker]['bids'][1])
+        ask_volume = np.sum(self.get_orderbooks[ticker]['asks'][1])
+
+        volatility = 0.2 # Placeholder for now
+
+        bid_price = wmid - ((spread / 2) * (ask_volume / bid_volume)) - volatility
+        ask_price = wmid + ((spread / 2) * (bid_volume / ask_volume)) + volatility
+
+
+        return (int(np.round(bid_price)), int(np.round(ask_price)))
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())
