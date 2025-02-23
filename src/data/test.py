@@ -7,7 +7,7 @@ pd.set_option('display.max_rows', 1000)
 pd.set_option('display.max_columns', 1000)
 
 # Load your CSV file
-df = pd.read_csv("train_data.csv")
+df = pd.read_csv("live_data.csv")
 print(len(df.index))
 
 # Select only the price columns
@@ -22,7 +22,7 @@ print(correlation_matrix)
 
 # Define the two stock price series
 stock_a = df["StockB_Price"]
-stock_b = df["StockE_Ask"]
+stock_b = df["StockE_Price"]
 
 # Shift Stock A forward by 346 timesteps
 df["stockA_future"] = stock_a.shift(-346)
