@@ -32,11 +32,12 @@ class MMStrategy(Strategy):
             position = positions[ticker]['quantity']
             #print(self._shared_state.portfolio.orders)
             order_list = self._shared_state.portfolio.orders.get(ticker, [])
+            bid_price, ask_price = await self.calc_bid_ask(ticker)
 
             # Ensure position does not exceed bounds
             if position < 100:  # Can still buy
                 volume_bid = (100 - position)
-                bid_price = wmid - (volume_bid / 200) * abs(position) / 100  # Dynamic spread
+                #bid_price = wmid - (volume_bid / 200) * abs(position) / 100  # Dynamic spread
                 prev_order = next((obj for obj in order_list if obj.side == "BID"), None)
 
                 if prev_order is not None and round(prev_order.price, 0) != round(bid_price, 0):
@@ -49,7 +50,7 @@ class MMStrategy(Strategy):
                     )
             if position > -100:  # Can still sell
                 volume_ask = (100 + position)
-                ask_price = wmid + (volume_ask / 200) * abs(position) / 100  # Dynamic spread
+                #ask_price = wmid + (volume_ask / 200) * abs(position) / 100  # Dynamic spread
                 prev_order = next((obj for obj in order_list if obj.side == "ASK"),
                                   None)
 
@@ -67,8 +68,8 @@ class MMStrategy(Strategy):
         wmid = self.wmid(ticker=ticker)
         spread = self.spread(ticker=ticker)
 
-        bid_volume = np.sum(self.get_orderbooks[ticker]['bids'][1])
-        ask_volume = np.sum(self.get_orderbooks[ticker]['asks'][1])
+        bid_volume = np.sum(self.get_orderbooks()[ticker]['bids'][1])
+        ask_volume = np.sum(self.get_orderbooks()[ticker]['asks'][1])
 
         volatility = 0.2 # Placeholder for now
 
@@ -76,7 +77,7 @@ class MMStrategy(Strategy):
         ask_price = wmid + ((spread / 2) * (bid_volume / ask_volume)) + volatility
 
 
-        return (int(np.round(bid_price)), int(np.round(ask_price)))
+        return int(np.round(bid_price)), int(np.round(ask_price))
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())
