@@ -55,9 +55,9 @@ class Prioritizer:
         """
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print(
+            '''print(
                 f"Limit order with params {ticker}, {volume}, {price} rejected due to rate limit"
-            )
+            )'''
             return
         self._rate_limit_window.append(time.time())
         await self._trading_client.place_limit(ticker, volume, price, is_bid)
@@ -75,9 +75,9 @@ class Prioritizer:
         """
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print(
+            '''print(
                 f"Market order with params {ticker}, {volume} rejected due to rate limit"
-            )
+            )'''
             return
         self._rate_limit_window.append(time.time())
         await self._trading_client.place_market(ticker, volume, is_bid)
@@ -91,7 +91,7 @@ class Prioritizer:
         """
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print("Remove all orders rejected due to rate limit")
+            '''print("Remove all orders rejected due to rate limit")'''
             return
         self._rate_limit_window.append(time.time())
         await self._trading_client.remove_all()
@@ -99,7 +99,7 @@ class Prioritizer:
     async def remove_single(self, order_id: int) -> None:
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print(f"Remove order:{order_id} reject due to rate limit")
+            '''print(f"Remove order:{order_id} reject due to rate limit")'''
             return
         self._rate_limit_window.append(time.time())
         await self._trading_client.remove_order(order_id)
