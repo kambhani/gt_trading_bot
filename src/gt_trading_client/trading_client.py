@@ -264,7 +264,7 @@ class TradingClient:
         return (url, form_data)
 
 
-    async def remove_order(self, order_id: int) -> None:
+    async def remove_order(self, order: Order) -> None:
         """
         Remove order based on id asynchronously using aiohttp
 
@@ -273,7 +273,7 @@ class TradingClient:
         if not self._session_token:
             raise Exception("User not authenticated. Call user_buildup first.")
         
-        url, form_data = self._remove_order_params(order_id=order_id)
+        url, form_data = self._remove_order_params(order.id)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=form_data) as response:
@@ -284,11 +284,10 @@ class TradingClient:
                 if not message or not self._error_check(message=message):
                     return
                 
-            self._user_portfolio.remove_single_order()
-
-
+            self._user_portfolio.remove_single_order(order)
 
     ### End of Cancel Single Order ###
+
 
     def _remove_all_params(self) -> tuple[str, dict[str, Any]]:
         """

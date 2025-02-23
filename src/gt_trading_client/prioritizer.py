@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from collections import deque
+from .config.order import Order
 
 from .trading_client import TradingClient
 
@@ -96,11 +97,11 @@ class Prioritizer:
         self._rate_limit_window.append(time.time())
         await self._trading_client.remove_all()
 
-    async def remove_single(self, order_id: int) -> None:
+    async def remove_single(self, order: Order) -> None:
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print(f"Remove order:{order_id} reject due to rate limit")
+            print(f"Remove order:{order.id} reject due to rate limit")
             return
         self._rate_limit_window.append(time.time())
-        await self._trading_client.remove_order(order_id)
+        await self._trading_client.remove_order(order)
 

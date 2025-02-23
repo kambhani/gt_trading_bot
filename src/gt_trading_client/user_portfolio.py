@@ -95,8 +95,13 @@ class UserPortfolio:
         self._orders = {}
 
     #Single order remove
-    def remove_single_order(self) -> None:
-        # TO-DO
+    def remove_single_order(self, order: Order) -> None:
+        order_list = self._orders[order.ticker]
+        
+        print(order_list)
+        order_list.remove(order.id)
+        print(order_list)
+
         return
 
     @property
