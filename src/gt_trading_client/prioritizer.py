@@ -100,7 +100,7 @@ class Prioritizer:
     async def remove_single(self, order: Order) -> None:
         self._update_rate_limit_window()
         if len(self._rate_limit_window) >= self._rate_limit:
-            print(f"Remove order:{order.id} reject due to rate limit")
+            '''print(f"Remove order:{order.id} reject due to rate limit")'''
             return
         self._rate_limit_window.append(time.time())
         await self._trading_client.remove_order(order)
