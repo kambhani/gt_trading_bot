@@ -94,6 +94,11 @@ class UserPortfolio:
         """
         self._orders = {}
 
+    #Single order remove
+    def remove_single_order(self) -> None:
+        # TO-DO
+        return
+
     @property
     def positions(self) -> dict[str, float]:
         """

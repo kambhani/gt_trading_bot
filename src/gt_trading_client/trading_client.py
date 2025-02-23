@@ -171,6 +171,7 @@ class TradingClient:
                     return
                 volume_filled = message["volumeFilled"]
                 volume_remaining = volume - volume_filled
+                # Order_id
                 order_id = message["orderId"]
                 if volume_filled > 0:
                     self._user_portfolio.add_position(
@@ -244,6 +245,50 @@ class TradingClient:
                         position_delta=volume_filled if is_bid else -volume_filled,
                         price=price,
                     )
+
+     ### Cancel Single Order ###
+
+    def _remove_order_params(self, order_id: int) -> tuple[str, dict[str, Any]]:
+        """
+        Helper method to format remove a single order API request.
+
+        Returns: tuple[str, dict[str, Any]] - tuple containing request URL and JSON parameters
+        """
+
+        url = f"{self._http_endpoint}/remove"
+        form_data = {
+            "orderId": order_id,
+            "username": self._username,
+            "sessionToken": self._session_token
+        }
+        return (url, form_data)
+
+
+    async def remove_order(self, order_id: int) -> None:
+        """
+        Remove order based on id asynchronously using aiohttp
+
+        Returns: None
+        """
+        if not self._session_token:
+            raise Exception("User not authenticated. Call user_buildup first.")
+        
+        url, form_data = self._remove_order_params(order_id=order_id)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=form_data) as response:
+                content = await response.json()  # Parse JSON response asynchronously
+                print(content)
+                message = content["message"]
+
+                if not message or not self._error_check(message=message):
+                    return
+                
+            self._user_portfolio.remove_single_order()
+
+
+
+    ### End of Cancel Single Order ###
 
     def _remove_all_params(self) -> tuple[str, dict[str, Any]]:
         """
