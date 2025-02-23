@@ -8,6 +8,7 @@ from gt_trading_client import TradingClient
 from gt_trading_client import Strategy
 from test_strategy import TestStrategy
 from mm_strategy import MMStrategy
+from leadlag import LeadLagStrategy
 
 RATE_LIMIT = 15
 API_KEY = "RVKXKPCFSKYRCUPA"
@@ -32,7 +33,7 @@ async def start_strategy() -> None:
     shared_state = client.shared_state
     prioritizer = Prioritizer(rate_limit=RATE_LIMIT, trading_client=client)
 
-    strategy: Strategy = MMStrategy(quoter=prioritizer, shared_state=shared_state)
+    strategy: Strategy = LeadLagStrategy(quoter=prioritizer, shared_state=shared_state)
 
     client.set_strategy(strategy=strategy)
 
