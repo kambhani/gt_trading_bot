@@ -25,7 +25,7 @@ stock_a = df["StockB_Price"]
 stock_b = df["StockE_Price"]
 
 # Shift Stock A forward by 346 timesteps
-df["stockA_future"] = stock_a.shift(-346)
+df["stockA_future"] = stock_a.shift(50)
 
 # Compute signals: Only trade if Stock A moves by more than ±2%
 threshold = 0.3  # 2% threshold

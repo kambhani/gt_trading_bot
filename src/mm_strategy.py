@@ -18,10 +18,10 @@ class MMStrategy(Strategy):
         #print("Orderbook update", time.time())
         #await self._quoter.remove_all()
         await self.market_make_stock("A")
-        #await self.market_make_stock("B")
-        #await self.market_make_stock("C")
-        #await self.market_make_stock("D")
-        #await self.market_make_stock("E")
+        await self.market_make_stock("B")
+        await self.market_make_stock("C")
+        await self.market_make_stock("D")
+        await self.market_make_stock("E")
 
     async def market_make_stock(self, ticker: str):
         
@@ -34,11 +34,11 @@ class MMStrategy(Strategy):
 
         if position > 0:
             # We have a buy positon so we need to sell
-            self.remove_risk(ticker, position=position)
+            await self.remove_risk(ticker, position=position)
             return
         if position < 0:
             # We have a sell postion so we need to buy
-            self.remove_risk(ticker, position=position)
+            await self.remove_risk(ticker, position=position)
             return
 
 
@@ -107,6 +107,7 @@ class MMStrategy(Strategy):
 
         while position != 0:
             position = self.get_positions()[ticker]['quantity']
+        print("Arrived")
 
 
 
@@ -138,7 +139,7 @@ class MMStrategy(Strategy):
             # return WMID calc
             return best_bid[0], best_ask[0]
 
-        return 1, 1000
+        return best_bid[0], best_ask[0]
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())

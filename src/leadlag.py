@@ -31,7 +31,7 @@ class LeadLagStrategy(Strategy):
                 # buy E, sell later
                 e_ask = self.best_ask(ticker='E')
                 if e_ask is not None:
-                    asyncio.create_task(self._quoter.place_limit(ticker="E", volume=e_ask[1], price=self.wmid('E'), is_bid=True))
+                    asyncio.create_task(self._quoter.place_limit(ticker="E", volume=max(e_ask[1], 5), price=self.wmid('E'), is_bid=True))
                     self.BETickCyle = 0
                     self.E_stats[0] = False
                     self.E_stats[1] = e_ask[1]
@@ -40,7 +40,7 @@ class LeadLagStrategy(Strategy):
                 e_bid = self.best_bid(ticker='E')
                 if e_bid is not None:
                     asyncio.create_task(
-                        self._quoter.place_limit(ticker="E", volume=e_bid[1], price=self.wmid('E'), is_bid=False))
+                        self._quoter.place_limit(ticker="E", volume=max(e_bid[1], 5), price=self.wmid('E'), is_bid=False))
                     self.BETickCyle = 0
                     self.E_stats[0] = True
                     self.E_stats[1] = e_bid[1]
