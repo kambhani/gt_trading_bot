@@ -32,6 +32,15 @@ class MMStrategy(Strategy):
         # Need to only remove order if price changes
         position: int = self.get_positions()[ticker]['quantity']
 
+        if position > 0:
+            # We have a buy positon so we need to sell
+            self.remove_risk(ticker, position=position)
+            return
+        if position < 0:
+            # We have a sell postion so we need to buy
+            self.remove_risk(ticker, position=position)
+            return
+
 
         # Gets our order list
         order_list = self._shared_state.portfolio.orders.get(ticker, [])
@@ -76,6 +85,19 @@ class MMStrategy(Strategy):
                     self._quoter.place_limit(ticker=ticker, volume=volume_ask, price=ask_price, is_bid=False)
                 )
 
+    # We are long positoins and need to remove them
+    async def remove_risk(self, ticker: str, position: int):
+        # Remove all orders on ticker
+        # for order in self._shared_state.portfolio.orders.get(ticker, []):
+        #     await self._quoter.remove_single(order)
+
+
+        while position != 0:
+            position = self.get_positions()[ticker]['quantity']
+
+
+
+
     # WMID calc
     async def calc_bid_ask(self, ticker: str):
         wmid = self.wmid(ticker=ticker)
@@ -103,7 +125,7 @@ class MMStrategy(Strategy):
             # return WMID calc
             return (1, 1000)
         
-        return (best_ask[0] - 1, best_bid + 1)
+        return (best_ask[0] - 1, best_bid[0] + 1)
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())
