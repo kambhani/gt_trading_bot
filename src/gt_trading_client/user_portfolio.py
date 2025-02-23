@@ -98,9 +98,9 @@ class UserPortfolio:
     def remove_single_order(self, order: Order) -> None:
         order_list = self._orders[order.ticker]
         
-        print(order_list)
-        order_list.remove(order.id)
-        print(order_list)
+        #print(order_list)
+        order_list.remove(order)
+        #print(order_list)
 
         return
 
