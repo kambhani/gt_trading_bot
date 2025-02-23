@@ -94,6 +94,16 @@ class MMStrategy(Strategy):
         # for order in self._shared_state.portfolio.orders.get(ticker, []):
         #     await self._quoter.remove_single(order)
 
+        if position > 0:
+            for order in self._shared_state.portfolio.orders.get(ticker, []):
+                if order.side == 'BID':
+                    await self._quoter.remove_single(order)
+        
+        if position < 0:
+            for order in self._shared_state.portfolio.orders.get(ticker, []):
+                if order.side == 'ASK':
+                    await self._quoter.remove_single(order)
+
 
         while position != 0:
             position = self.get_positions()[ticker]['quantity']
