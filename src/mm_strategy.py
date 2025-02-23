@@ -68,8 +68,8 @@ class MMStrategy(Strategy):
         wmid = self.wmid(ticker=ticker)
         spread = self.spread(ticker=ticker)
 
-        bid_volume = np.sum(self.get_orderbooks()[ticker]['bids'][1])
-        ask_volume = np.sum(self.get_orderbooks()[ticker]['asks'][1])
+        bid_volume = np.sum(self.get_orderbooks()[ticker]['bids'].values())
+        ask_volume = np.sum(self.get_orderbooks()[ticker]['asks'].values())
 
         volatility = 0.2 # Placeholder for now
 
