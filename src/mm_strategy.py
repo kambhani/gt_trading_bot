@@ -31,14 +31,18 @@ class MMStrategy(Strategy):
 
         # Need to only remove order if price changes
         position: int = self.get_positions()[ticker]['quantity']
-        
-        
-        
+
+
         # Gets our order list
         order_list = self._shared_state.portfolio.orders.get(ticker, [])
 
-        # Calculate the new bid and ask prices
-        bid_price, ask_price = await self.calc_bid_ask(ticker)
+        # Calculate the new bid and ask prices based of WMID
+        bid_price, ask_price = await self.calc_bid_ask2(ticker)
+
+        # Double check postion
+        # if not (-100 <= position <= 100):
+        #     return
+
 
         # Ensure position does not exceed bounds
         if position < 100:  # Can still buy
@@ -56,6 +60,7 @@ class MMStrategy(Strategy):
                 asyncio.create_task(
                     self._quoter.place_limit(ticker=ticker, volume=volume_bid, price=bid_price, is_bid=True)
                 )
+
         if position > -100:  # Can still sell
             volume_ask = (100 + position)
             present = False
@@ -71,7 +76,7 @@ class MMStrategy(Strategy):
                     self._quoter.place_limit(ticker=ticker, volume=volume_ask, price=ask_price, is_bid=False)
                 )
 
-
+    # WMID calc
     async def calc_bid_ask(self, ticker: str):
         wmid = self.wmid(ticker=ticker)
         spread = self.spread(ticker=ticker)
@@ -86,6 +91,19 @@ class MMStrategy(Strategy):
 
 
         return int(np.round(bid_price)), int(np.round(ask_price))
+    
+    # Spread Calc
+    async def calc_bid_ask2(self, ticker: str):
+        best_bid = await self.best_bid(ticker)
+        best_ask = await self.best_ask(ticker)
+        if best_bid is None or best_ask is None:
+            raise KeyError("No bid or ask")
+        
+        if best_ask[0] - best_bid[0] > 2:
+            # return WMID calc
+            return (1, 1000)
+        
+        return (best_ask[0] - 1, best_bid + 1)
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())
