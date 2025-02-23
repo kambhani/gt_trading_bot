@@ -33,7 +33,7 @@ async def start_strategy() -> None:
     shared_state = client.shared_state
     prioritizer = Prioritizer(rate_limit=RATE_LIMIT, trading_client=client)
 
-    strategy: Strategy = LeadLagStrategy(quoter=prioritizer, shared_state=shared_state)
+    strategy: Strategy = MMStrategy(quoter=prioritizer, shared_state=shared_state)
 
     client.set_strategy(strategy=strategy)
 

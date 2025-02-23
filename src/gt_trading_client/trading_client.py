@@ -165,7 +165,7 @@ class TradingClient:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=form_data) as response:
                 content = await response.json()
-                print(content)
+                #print(content)
                 message = content["message"]
                 if not self._error_check(message=message):
                     return
@@ -278,7 +278,7 @@ class TradingClient:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=form_data) as response:
                 content = await response.json()  # Parse JSON response asynchronously
-                print(content)
+                #print(content)
                 message = content["message"]
 
                 if not message or not self._error_check(message=message):
@@ -317,7 +317,7 @@ class TradingClient:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=form_data) as response:
                 content = await response.json()  # Parse JSON response asynchronously
-                print(content)
+                #print(content)
                 message = content["message"]
 
                 if not message or not self._error_check(message=message):
