@@ -24,25 +24,22 @@ class MMStrategy(Strategy):
         await self.market_make_stock("E")
 
     async def market_make_stock(self, ticker: str):
-        # need to only remove order if price changes
-        positions = self.get_positions()
-        wmid = self.wmid(ticker)
-        #print(positions[ticker])
-        if wmid:
-            position = positions[ticker]['quantity']
+        pass
 
-            # Ensure position does not exceed bounds
-            if position < 100:  # Can still buy
-                volume_bid = 100 - position
-                bid_price = wmid - (volume_bid / 200) * max(0.04, min(1.0, abs(position) / 100))  # Dynamic spread
-                asyncio.create_task(
-                    self._quoter.place_limit(ticker=ticker, volume=volume_bid, price=bid_price, is_bid=True))
+    async def calc_bid_ask(self, ticker: str):
+        wmid = self.wmid(ticker=ticker)
+        spread = self.spread(ticker=ticker)
 
-            if position > -100:  # Can still sell
-                volume_ask = 100 + position
-                ask_price = wmid + (volume_ask / 200) * max(0.04, min(1.0, abs(position) / 100))  # Dynamic spread
-                asyncio.create_task(
-                    self._quoter.place_limit(ticker=ticker, volume=volume_ask, price=ask_price, is_bid=False))
+        bid_volume = np.sum(self.get_orderbooks[ticker]['bids'][1])
+        ask_volume = np.sum(self.get_orderbooks[ticker]['asks'][1])
+
+        volatility = 0.2 # Placeholder for now
+
+        bid_price = wmid - ((spread / 2) * (ask_volume / bid_volume)) - volatility
+        ask_price = wmid + ((spread / 2) * (bid_volume / ask_volume)) + volatility
+
+
+        return (int(np.round(bid_price)), int(np.round(ask_price)))
 
     async def on_portfolio_update(self) -> None:
         #print("Portfolio update", self.get_pnl())
