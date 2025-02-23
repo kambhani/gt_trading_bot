@@ -38,27 +38,29 @@ class MMStrategy(Strategy):
             if position < 100:  # Can still buy
                 volume_bid = (100 - position)
                 #bid_price = wmid - (volume_bid / 200) * abs(position) / 100  # Dynamic spread
-                prev_order = next((obj for obj in order_list if obj.side == "BID"), None)
-
-                if prev_order is not None and round(prev_order.price, 0) != round(bid_price, 0):
-                    # Price changed, we need to remove previous order
-                    await self._quoter.remove_single(prev_order)
-                    prev_order = None
-                if prev_order is None and volume_bid > 0:
+                present = False
+                for order in order_list:
+                    if order.side == "BID" and round(order.price, 0) != round(bid_price, 0):
+                        await self._quoter.remove_single(order)
+                    elif order.side == "BID" and round(order.price, 0) == round(bid_price, 0) and not present:
+                        present = True
+                    elif order.side == "BID" and round(order.price, 0) == round(bid_price, 0) and present:
+                        await self._quoter.remove_single(order)
+                if volume_bid > 0 and not present:
                     asyncio.create_task(
                         self._quoter.place_limit(ticker=ticker, volume=volume_bid, price=bid_price, is_bid=True)
                     )
             if position > -100:  # Can still sell
                 volume_ask = (100 + position)
-                #ask_price = wmid + (volume_ask / 200) * abs(position) / 100  # Dynamic spread
-                prev_order = next((obj for obj in order_list if obj.side == "ASK"),
-                                  None)
-
-                if prev_order is not None and round(prev_order.price, 0) != round(ask_price, 0):
-                    # Price changed, we need to remove previous order
-                    await self._quoter.remove_single(prev_order)
-                    prev_order = None
-                if prev_order is None and volume_ask > 0:
+                present = False
+                for order in order_list:
+                    if order.side == "ASK" and round(order.price, 0) != round(ask_price, 0):
+                        await self._quoter.remove_single(order)
+                    elif order.side == "ASK" and round(order.price, 0) == round(ask_price, 0) and not present:
+                        present = True
+                    elif order.side == "ASK" and round(order.price, 0) == round(ask_price, 0) and present:
+                        await self._quoter.remove_single(order)
+                if volume_ask > 0 and not present:
                     asyncio.create_task(
                         self._quoter.place_limit(ticker=ticker, volume=volume_ask, price=ask_price, is_bid=False)
                     )
